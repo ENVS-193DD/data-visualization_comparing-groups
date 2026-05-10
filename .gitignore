@@ -3,6 +3,5 @@
 .RData
 .Ruserdata
 *.Rproj
-key.qmd
 
 /.quarto/
