@@ -54,7 +54,7 @@ shorebirds_wy2025 <- birds |>
   )) |> 
   group_by(species) |> 
   mutate(species_label = case_when(
-    observation_date == max(observation_date) ~ species
+    observation_date == min(observation_date) ~ species
   )) |> 
   ungroup() |> 
   left_join(weather, by = c("observation_date" = "date"))
@@ -85,6 +85,8 @@ shorebirds_all <- birds |>
 ```
 
 ```{r}
+#| fig-height: 4
+#| fig-width: 10
 ggplot(data = shorebirds_wy2025,
        mapping = aes(x = observation_date,
                      y = total,
@@ -92,13 +94,32 @@ ggplot(data = shorebirds_wy2025,
                      group = species)) +
   geom_point() +
   geom_line() +
-  scale_x_date(limits = c(as_date("2024-10-01"), as_date("2025-11-01"))) +
-  geom_label_repel(mapping = aes(label = species_label),
-                   hjust = 0,
-                   direction = "y",
-                   max.overlaps = getOption("ggrepel.max.overlaps", default = 20))
+  scale_x_date(expand = expansion(mult = c(0.3, 0.1)),
+               limits = c(as_date("2024-10-01"), NA),
 
-ggplot(data = birds_summary,
+               breaks = as_date(c("2024-10-01", "2025-01-01", "2025-03-01", "2025-06-01", "2025-09-01")),
+               date_labels = "%B") +
+  scale_y_continuous(expand = expansion(mult = c(0.01, 0.01))) +
+  geom_text_repel(mapping = aes(label = species_label),
+                  seed = 100,
+                  # right align labels
+                  hjust = 1,
+                  # repel in y direction only
+                  direction = "y",
+                  # linetype
+                  segment.linetype = 3,
+                  # nudge starting point 5 units to left
+                  nudge_x = -1,
+                  nudge_y = 1,
+                  # width
+                  segment.size = 0.5,
+                  #max.overlaps = Inf,
+                  force = 0.5,
+                  xlim  = as_date("2024-10-01")) +
+  theme(panel.background = element_blank(),
+        panel.grid = element_blank())
+
+ggplot(data = shorebirds_all,
        mapping = aes(x = mean_monthly_tmax_f,
                      y = total)) +
   geom_point() +
