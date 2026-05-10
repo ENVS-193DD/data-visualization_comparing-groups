@@ -23,36 +23,86 @@ library(tidyverse)
 
 birds <- read_csv("https://raw.githubusercontent.com/ENVS-193DD/datasets/refs/heads/main/birds/birds.csv")
 
-birds_summary <- birds |> 
+weather <- read_csv("https://raw.githubusercontent.com/ENVS-193DD/datasets/refs/heads/main/water-quality/NOAA-weather-data.csv") |> 
+  mutate(date = mdy(DATE),
+         month = month(date)) |> 
+  group_by(month) |> 
+  mutate(total_monthly_precip_in = sum(PRCP, na.rm = TRUE),
+         mean_monthly_tmax_f = mean(TMAX, na.rm = TRUE)) |> 
+  ungroup() |> 
+  select(date, total_monthly_precip_in, mean_monthly_tmax_f) |> 
+  distinct()
+  
+
+shorebirds_wy2025 <- birds |> 
   filter(e_bird_group == "Shorebirds" &
            between(observation_date, as_date("2024-10-01"), as_date("2025-09-30"))) |> 
   group_by(observation_date, species) |> 
   summarize(total = sum(count)) |> 
   ungroup() |> 
-  filter(!(species %in% c("Peep sp.", "Sandpiper sp.", "Dowitcher sp."))) |> 
+  # taking out species only seen once
+  filter(!(species %in% c("Peep sp.", "Sandpiper sp.", "Dowitcher sp.", 
+                          "Wilson's Snipe", "Red-necked Phalarope"))) |> 
   complete(observation_date, species,
            fill = list(total = 0)) |> 
-  mutate(migratory = case_when(
-    species %in% c("Black-necked Stilt", "Red-necked Phalarope") ~ "resident",
-    .default = "migratory"
+  mutate(family = case_when(
+    species %in% c("Black-necked Stilt") ~ "Recurvirostridae",
+    species %in% c("Greater Yellowlegs", "Killdeer", 
+                   "Least Sandpiper", "Long-billed Dowitcher", 
+                   "Western Sandpiper") ~ "Scolopacidae",
+    species %in% c("Semipalmated Plover") ~ "Charadriidae"
   )) |> 
   group_by(species) |> 
   mutate(species_label = case_when(
     observation_date == max(observation_date) ~ species
   )) |> 
-  ungroup() 
+  ungroup() |> 
+  left_join(weather, by = c("observation_date" = "date"))
+
+shorebirds_all <- birds |> 
+  filter(e_bird_group == "Shorebirds") |> 
+  group_by(observation_date, species) |> 
+  summarize(total = sum(count)) |> 
+  ungroup() |> 
+  # taking out species only seen once
+  # filter(!(species %in% c("Peep sp.", "Sandpiper sp.", "Dowitcher sp.", 
+  #                         "Wilson's Snipe", "Red-necked Phalarope"))) |> 
+  complete(observation_date, species,
+           fill = list(total = 0)) |> 
+  mutate(family = case_when(
+    species %in% c("Black-necked Stilt") ~ "Recurvirostridae",
+    species %in% c("Greater Yellowlegs", "Killdeer", 
+                   "Least Sandpiper", "Long-billed Dowitcher", 
+                   "Western Sandpiper", "Wilson's Snipe", "Red-necked Phalarope") ~ "Scolopacidae",
+    species %in% c("Semipalmated Plover") ~ "Charadriidae"
+  )) |> 
+  group_by(species) |> 
+  mutate(species_label = case_when(
+    observation_date == max(observation_date) ~ species
+  )) |> 
+  ungroup() |> 
+  left_join(weather, by = c("observation_date" = "date"))
 ```
 
 ```{r}
-ggplot(data = birds_summary,
+ggplot(data = shorebirds_wy2025,
        mapping = aes(x = observation_date,
                      y = total,
-                     color = migratory,
+                     color = family,
                      group = species)) +
   geom_point() +
   geom_line() +
-  scale_x_date(limits = c(as_date("2024-10-01"), as_date("2025-12-30"))) +
+  scale_x_date(limits = c(as_date("2024-10-01"), as_date("2025-11-01"))) +
   geom_label_repel(mapping = aes(label = species_label),
-                   hjust = 1)
+                   hjust = 0,
+                   direction = "y",
+                   max.overlaps = getOption("ggrepel.max.overlaps", default = 20))
+
+ggplot(data = birds_summary,
+       mapping = aes(x = mean_monthly_tmax_f,
+                     y = total)) +
+  geom_point() +
+  facet_wrap(~ species,
+             scales = "free_y")
 ```
 
