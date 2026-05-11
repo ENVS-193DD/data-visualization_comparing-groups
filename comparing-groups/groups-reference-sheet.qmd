@@ -350,7 +350,7 @@ The transformation can help with visualization (i.e. make it easier to pick out 
 
 - x-axis: categories (levels in a factor)
 - y-axis: variable of interest
-- geometry: jittered points
+- geometry: violin
 
 **Pay attention to:**
 
