@@ -122,10 +122,11 @@ ggplot(data = shorebirds_wy2025,
         panel.grid = element_blank())
 
 ggplot(data = shorebirds_all,
-       mapping = aes(x = mean_monthly_tmax_f,
+       mapping = aes(x = total_monthly_precip_in,
                      y = total)) +
   geom_point() +
   facet_wrap(~ species,
              scales = "free_y")
+# is this a "causal" relationship or do these variables "co-vary"?
 ```
 
