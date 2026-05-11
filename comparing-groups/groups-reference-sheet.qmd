@@ -31,7 +31,7 @@ library(ggridges)
 ```{r}
 #| label: data
 
-# reading in data
+# reading in data from "raw" csv stored in repo: https://github.com/ENVS-193DD/datasets
 wq <- read_csv("https://raw.githubusercontent.com/ENVS-193DD/datasets/refs/heads/main/water-quality/wq_clean.csv") |> 
   # reordering factor levels
   mutate(site_name = fct_relevel(site_name,
