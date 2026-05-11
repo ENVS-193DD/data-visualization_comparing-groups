@@ -6,6 +6,8 @@
 
 This is a repository for data visualization options.
 
+i'm adding stuff to my own readme here
+
 # Data and file information
 
 ```
@@ -20,3 +22,5 @@ This is a repository for data visualization options.
 # Rendered output
 
 - [Reference sheet for comparing groups](https://github.com/ENVS-193DD/data-visualization_spring-2026/blob/main/comparing-groups/groups-reference-sheet.pdf)
+
+- here's another thing
