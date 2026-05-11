@@ -12,8 +12,9 @@ This is a repository for data visualization options.
 .
 ├── README.md
 ├── comparing-groups
-│   ├── groups-reference-sheet.pdf         # reference sheet for figures - use this to get an overview
-│   └── groups-reference-sheet.qmd         # code for reference sheet - use this to get examples of code
+│   ├── figures                            # saved figures from reference sheet
+│   ├── groups-reference-sheet.pdf         # overview sheet (no code)
+│   └── groups-reference-sheet.qmd         # code and formatting examples
 └── data-visualization_spring-2026.Rproj
 ```
 
